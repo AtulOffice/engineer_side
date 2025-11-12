@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Upload, FileText, Trash2, Save, CheckCircle2 } from "lucide-react";
 import axios from "axios";
 import { useAppContext } from "../appContex";
+import toast from "react-hot-toast"
 
 const EngineerMom = ({ onSave, isEdit = false, }) => {
 
@@ -93,6 +94,15 @@ const EngineerMom = ({ onSave, isEdit = false, }) => {
       toast.error("Please select a Job Number before submitting MOM.");
       return;
     }
+    if (
+      !formData.siteStartDate ||
+      !formData.siteEndDate ||
+      new Date(formData.siteStartDate) > new Date(formData.siteEndDate)
+    ) {
+      toast.error("Please enter valid Site Start and End Dates (Start must be before End).");
+      return;
+    }
+
     try {
       const payload = {
         ...formData,
