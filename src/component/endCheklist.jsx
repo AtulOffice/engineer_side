@@ -45,17 +45,20 @@ export default function EndChecklistForm({ project, onClose }) {
         const res = await axios.get(
           `${import.meta.env.VITE_API_URL}/endCheck/project/${project._id}`
         );
+
         const checklist = res.data?.data || null;
 
         if (checklist) {
+          console.log("📌 Existing END checklist found — merging");
+
           setFormData(prev => ({
             ...prev,
+            email: checklist.email || user?.email || "",
             jobNumber: checklist.jobNumber || project.jobNumber || "",
             engineerName: checklist.engineerName || user?.name || "",
             customerName: checklist.customerName || project.client || "",
             endUser: checklist.endUser || project.endUser || "",
             site: checklist.site || project.location || "",
-
             poNumber: checklist.poNumber || project.orderNumber || "",
             poDate: checklist.poDate
               ? checklist.poDate.split("T")[0]
@@ -66,7 +69,6 @@ export default function EndChecklistForm({ project, onClose }) {
             contactPerson: checklist.contactPerson || project.ContactPersonName || "",
             contactPersonNumber:
               checklist.contactPersonNumber || project.ContactPersonNumber || "",
-
             visitStartDate: checklist.visitStartDate
               ? checklist.visitStartDate.split("T")[0]
               : project.visitDate
@@ -76,49 +78,53 @@ export default function EndChecklistForm({ project, onClose }) {
             visitEndDate: checklist.visitEndDate
               ? checklist.visitEndDate.split("T")[0]
               : "",
-
             momNumber: checklist.momNumber || "",
             projectStatus: checklist.projectStatus || "",
             momSignedByCustomer: checklist.momSignedByCustomer || "",
+
             pendingPoints: checklist.pendingPoints || "",
             customerRemarks: checklist.customerRemarks || "",
             completedWithinEstimatedTime:
               checklist.completedWithinEstimatedTime ?? false,
             facedChallenges: checklist.facedChallenges ?? false,
             challengeDetails: checklist.challengeDetails || "",
+
             completionDocuments: {
-              ...prev.completionDocuments,
-              ...checklist.completionDocuments,
+              asBuiltDrawings:
+                checklist.completionDocuments?.asBuiltDrawings || "",
+              finalLogicBackup:
+                checklist.completionDocuments?.finalLogicBackup || "",
+              finalScadaBackup:
+                checklist.completionDocuments?.finalScadaBackup || "",
+              expenseSettlement:
+                checklist.completionDocuments?.expenseSettlement || "",
             },
 
-            email: checklist.email || user?.email || ""
+            projectId: checklist.projectId,
+            submittedBy: checklist.submittedBy
           }));
 
           return;
         }
-
         setFormData(prev => ({
           ...prev,
+          email: user?.email || "",
           jobNumber: project.jobNumber || "",
           engineerName: user?.name || "",
           customerName: project.client || "",
           endUser: project.endUser || "",
           site: project.location || "",
-
           poNumber: project.orderNumber || "",
           poDate: project.orderDate
             ? new Date(project.orderDate).toISOString().split("T")[0]
             : "",
-
           contactPerson: project.ContactPersonName || "",
           contactPersonNumber: project.ContactPersonNumber || "",
-
           visitStartDate: project.visitDate
             ? new Date(project.visitDate).toISOString().split("T")[0]
             : "",
-
-          email: user?.email || "",
         }));
+
       } catch (error) {
         console.log("❌ Failed to load END checklist:", error);
       }
@@ -130,18 +136,30 @@ export default function EndChecklistForm({ project, onClose }) {
 
   const handleChange = (e, section, key) => {
     const { name, value, type, checked } = e.target;
+
     if (section) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
-        [section]: { ...prev[section], [key]: value },
+        [section]: {
+          ...prev[section],
+          [key]: value,
+        },
       }));
-    } else {
-      setFormData((prev) => ({
+    } else if (name) {
+
+      setFormData(prev => ({
         ...prev,
         [name]: type === "checkbox" ? checked : value,
       }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [key]: value,
+      }));
     }
   };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -223,7 +241,7 @@ export default function EndChecklistForm({ project, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 scrollbar-glass">
       <div className="relative w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-10 space-y-10 border border-gray-200 overflow-y-auto max-h-[90vh]">
-        {/* Close button (optional) */}
+
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
@@ -239,7 +257,6 @@ export default function EndChecklistForm({ project, onClose }) {
           </p>
         </div>
 
-        {/* Basic Information */}
         <Section title="Basic Information" color="from-blue-500 to-cyan-500">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
@@ -266,7 +283,6 @@ export default function EndChecklistForm({ project, onClose }) {
           </div>
         </Section>
 
-        {/* Project Status */}
         <Section title="Project Status" color="from-green-500 to-emerald-500">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {renderEnumSelect(
@@ -285,7 +301,6 @@ export default function EndChecklistForm({ project, onClose }) {
           </div>
         </Section>
 
-        {/* Pending & Remarks */}
         <Section
           title="Pending Points & Remarks"
           color="from-orange-500 to-amber-500"
@@ -307,8 +322,7 @@ export default function EndChecklistForm({ project, onClose }) {
             />
           </div>
         </Section>
-
-        {/* Project Performance */}
+        
         <Section
           title="Project Performance"
           color="from-purple-500 to-pink-500"

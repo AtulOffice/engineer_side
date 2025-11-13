@@ -74,40 +74,43 @@ const StartChecklistForm = ({ project, onClose }) => {
         const checklist = res.data?.data || null;
 
         if (checklist) {
-          console.log("📌 Existing checklist found — merging values");
+          console.log("📌 Existing checklist found — merging ALL fields");
 
           setFormData(prev => ({
             ...prev,
-            jobNumber: checklist.jobNumber || project.jobNumber || "",
-            engineerName: checklist.engineerName || user?.name || "",
-            customerName: checklist.customerName || project.client || "",
-            endUser: checklist.endUser || project.endUser || "",
-            site: checklist.site || project.location || "",
-            poNumber: checklist.poNumber || project.orderNumber || "",
-            poDate:
-              checklist.poDate
-                ? checklist.poDate.split("T")[0]
-                : project.orderDate
-                  ? new Date(project.orderDate).toISOString().split("T")[0]
-                  : "",
+            email: checklist.email || user?.email || prev.email,
+            jobNumber: checklist.jobNumber || project.jobNumber || prev.jobNumber,
+            engineerName: checklist.engineerName || user?.name || prev.engineerName,
+            customerName: checklist.customerName || project.client || prev.customerName,
+            endUser: checklist.endUser || project.endUser || prev.endUser,
+            site: checklist.site || project.location || prev.site,
+            poNumber: checklist.poNumber || project.orderNumber || prev.poNumber,
+            poDate: checklist.poDate
+              ? checklist.poDate.split("T")[0]
+              : project.orderDate
+                ? new Date(project.orderDate).toISOString().split("T")[0]
+                : prev.poDate,
 
             contactPerson:
-              checklist.contactPerson ||
-              project.ContactPersonName ||
-              "",
+              checklist.contactPerson || project.ContactPersonName || prev.contactPerson,
+
             contactPersonNumber:
               checklist.contactPersonNumber ||
               project.ContactPersonNumber ||
-              "",
+              prev.contactPersonNumber,
 
-            visitStartDate:
-              checklist.visitStartDate
-                ? checklist.visitStartDate.split("T")[0]
-                : project.visitDate
-                  ? new Date(project.visitDate).toISOString().split("T")[0]
-                  : "",
+            visitStartDate: checklist.visitStartDate
+              ? checklist.visitStartDate.split("T")[0]
+              : project.visitDate
+                ? new Date(project.visitDate).toISOString().split("T")[0]
+                : prev.visitStartDate,
 
-            email: checklist.email || user?.email || "",
+            poCollected: checklist.poCollected || prev.poCollected,
+            scopeClarityTaken: checklist.scopeClarityTaken || prev.scopeClarityTaken,
+            scopeUnderstanding: checklist.scopeUnderstanding || prev.scopeUnderstanding,
+            freeDaysInPO: checklist.freeDaysInPO || prev.freeDaysInPO,
+            estimatedDuration: checklist.estimatedDuration || prev.estimatedDuration,
+
             internalDocuments: {
               ...prev.internalDocuments,
               ...checklist.internalDocuments,
@@ -127,16 +130,18 @@ const StartChecklistForm = ({ project, onClose }) => {
 
             readinessConfirmation:
               checklist.readinessConfirmation || prev.readinessConfirmation,
+
             travelArrangementBy:
               checklist.travelArrangementBy || prev.travelArrangementBy,
-            travelCostBy:
-              checklist.travelCostBy || prev.travelCostBy,
+
+            travelCostBy: checklist.travelCostBy || prev.travelCostBy,
+
             boardingArrangementBy:
               checklist.boardingArrangementBy || prev.boardingArrangementBy,
-            boardingCostBy:
-              checklist.boardingCostBy || prev.boardingCostBy,
-            gatePassDocsSent:
-              checklist.gatePassDocsSent || prev.gatePassDocsSent,
+
+            boardingCostBy: checklist.boardingCostBy || prev.boardingCostBy,
+
+            gatePassDocsSent: checklist.gatePassDocsSent || prev.gatePassDocsSent,
           }));
 
           return;
