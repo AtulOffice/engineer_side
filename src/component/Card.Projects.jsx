@@ -56,7 +56,6 @@ const CardAll = ({ project, indx }) => {
     }
   };
 
-  console.log(project);
   return (
     <div>
       {start && (
@@ -137,7 +136,10 @@ const CardAll = ({ project, indx }) => {
               </svg>
               {project.jobNumber}
             </span>
-            <div onClick={() => setStart(true)} className="relative group ">
+            <div onClick={(e) => {
+              e.stopPropagation();
+              setStart(true);
+            }} className="relative group ">
               <button
                 className="
 flex items-center justify-center
@@ -156,7 +158,9 @@ focus:outline-none focus:ring-4 focus:ring-blue-400
               </button>
             </div>
             <div
-              onClick={() => setWork(true)}
+              onClick={(e) => {
+                e.stopPropagation(); setWork(true)
+              }}
               className="relative group
 flex items-center justify-center
 bg-gradient-to-tr from-red-500 via-pink-500 to-yellow-500
@@ -172,7 +176,7 @@ focus:outline-none focus:ring-4 focus:ring-red-400
             >
               <FaTools className="w-5 h-5 drop-shadow" />
             </div>
-            <div onClick={() => setEnd(true)} className="relative group ">
+            <div onClick={(e) => { e.stopPropagation(); setEnd(true) }} className="relative group ">
               <button
                 className="
 flex items-center justify-center
@@ -255,12 +259,11 @@ focus:outline-none focus:ring-4 focus:ring-blue-400
                 <li className="flex items-center space-x-2">
                   <strong className="text-gray-700">Development:</strong>
                   <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-md ${
-                      project?.Development == "OFFICE" ||
+                    className={`px-2 py-1 text-xs font-semibold rounded-md ${project?.Development == "OFFICE" ||
                       project?.Development == "SITE"
-                        ? "bg-green-100 text-green-700"
-                        : ""
-                    }`}
+                      ? "bg-green-100 text-green-700"
+                      : ""
+                      }`}
                   >
                     {project?.Development}
                   </span>
@@ -269,10 +272,10 @@ focus:outline-none focus:ring-4 focus:ring-blue-400
                   <strong>MOM Dates:</strong>{" "}
                   {project?.momDate?.length > 0
                     ? project.momDate
-                        .map((dateStr) =>
-                          new Date(dateStr).toLocaleDateString()
-                        )
-                        .join(", ")
+                      .map((dateStr) =>
+                        new Date(dateStr).toLocaleDateString()
+                      )
+                      .join(", ")
                     : "-"}
                 </li>
               </>

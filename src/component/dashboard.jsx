@@ -18,10 +18,14 @@ import { useRef } from "react";
 import ProjectList from "./projectList";
 import { ProjectCatogary } from "./ProjectCatogary.jsx";
 import EngineerMom from "./Mom.form.jsx";
+import axios from "axios";
+import AssignmentPage from "./assingement.jsx";
+import EngineerWorkStatusFull from "./workFUllForm.jsx";
 
 const AdminDashboard = () => {
   const { toggle, toggleDev, user } = useAppContext();
   const [overvew, setOverview] = useState();
+  const [Assignments, setAssignments] = useState([])
 
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,14 +39,25 @@ const AdminDashboard = () => {
       const data = await fetchEngineerOveriew(user?._id);
       data && setOverview(data?.overview);
     };
-    fetchData();
+    if (user?._id) fetchData();
   }, [toggle, toggleDev, activeCard]);
 
-  // useEffect(() => {
-  //   if (!userLoading && user?.role === "design" && activeCard !== "fourteen") {
-  //     setActiveCard("fourteen");
-  //   }
-  // }, [user, userLoading, activeCard]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/engineerside/fetchAllEngineersProjectshow/${user?._id}`, { withCredentials: true })
+        setAssignments(response?.data?.totalAssignments || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    if (user?._id) fetchData();
+  }, []);
+
+
 
   useEffect(() => {
     sessionStorage.setItem("activeCard", activeCard);
@@ -70,7 +85,11 @@ const AdminDashboard = () => {
       case "two":
         return <ProjectCatogary key={"all"} all={true} title="ALL" />;
       case "three":
-        return <EngineerMom />;
+        return <EngineerMom setActiveCard={setActiveCard} />;
+      case "four":
+        return <AssignmentPage assignments={Assignments} />;
+      case "five":
+        return <EngineerWorkStatusFull />;
       case "nine":
         return (
           <ProjectCatogary
@@ -222,31 +241,31 @@ const AdminDashboard = () => {
                     MOM
                   </div>
                 </li>
-                <li>
-                  <div
-                    onClick={() => {
-                      handleActiveBar("thirteen");
-                      setSidebarOpen(false);
-                    }}
-                    className={`flex items-center px-4 py-3 text-gray-700 cursor-pointer font-medium ${activeCard === "thirteen" ? "bg-indigo-50 rounded-md" : ""
-                      }`}
-                  >
-                    <GoProjectRoadmap className="mr-3" size={20} />
-                    MOM LIST
-                  </div>
-                </li>
               </>
               <li>
                 <div
                   onClick={() => {
-                    handleActiveBar("fourteen");
+                    handleActiveBar("five");
                     setSidebarOpen(false);
                   }}
-                  className={`flex items-center px-4 py-3 text-gray-700 cursor-pointer font-medium ${activeCard === "fourteen" ? "bg-indigo-50 rounded-md" : ""
+                  className={`flex items-center px-4 py-3 text-gray-700 cursor-pointer font-medium ${activeCard === "five" ? "bg-indigo-50 rounded-md" : ""
                     }`}
                 >
                   <GoProjectRoadmap className="mr-3" size={20} />
-                  PROJECT DEV STATUS
+                  WORK REPORT
+                </div>
+              </li>
+              <li>
+                <div
+                  onClick={() => {
+                    handleActiveBar("four");
+                    setSidebarOpen(false);
+                  }}
+                  className={`flex items-center px-4 py-3 text-gray-700 cursor-pointer font-medium ${activeCard === "four" ? "bg-indigo-50 rounded-md" : ""
+                    }`}
+                >
+                  <GoProjectRoadmap className="mr-3" size={20} />
+                  MOM LIST
                 </div>
               </li>
               <>
@@ -260,7 +279,7 @@ const AdminDashboard = () => {
                       }`}
                   >
                     <RiProgress2Line className="mr-3" size={20} />
-                    WORK STATUS
+                    WORK LIST
                   </a>
                 </li>
               </>

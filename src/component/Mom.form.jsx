@@ -4,7 +4,7 @@ import axios from "axios";
 import { useAppContext } from "../appContex";
 import toast from "react-hot-toast"
 
-const EngineerMom = ({ onSave, isEdit = false, }) => {
+const EngineerMom = ({ setActiveCard, isEdit = false, }) => {
 
   const formval = {
     jobNumber: "",
@@ -79,7 +79,7 @@ const EngineerMom = ({ onSave, isEdit = false, }) => {
       }
     };
 
-    fetchData();
+    if (user?._id) fetchData();
   }, []);
 
 
@@ -126,10 +126,11 @@ const EngineerMom = ({ onSave, isEdit = false, }) => {
 
 
       if (response.data.success) {
-        toast.success("MOM saved successfully!", { id: toastId });
+        toast.success("MOM saved successfully!");
         setFormData(formval);
+        setActiveCard("two")
       } else {
-        toast.error(response.data.message || "Failed to save MOM.", { id: toastId });
+        toast.error(response.data.message || "Failed to save MOM.");
       }
     } catch (error) {
       console.error("Error saving MOM:", error);

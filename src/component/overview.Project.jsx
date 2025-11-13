@@ -12,7 +12,6 @@ const ProjectOverview = ({ overvew, setActiveCard }) => {
     startcheck: { name: "START", cnt: 0 },
     workstatus: { name: "WORK", cnt: 0 },
     endcheck: { name: "END", cnt: 0 },
-
   };
   const router = {
     UpComing: "three",
@@ -20,72 +19,82 @@ const ProjectOverview = ({ overvew, setActiveCard }) => {
     Urgent: "seven",
   };
   const statusGroupschart = {
-    complete: { name: "Completed", cnt: 0, color: "#fbbf24" },
-    running: { name: "Active", cnt: 0, color: "#6366f1" },
-    upcoming: { name: "Upcoming", cnt: 0, color: "#34d399" },
-    pending: { name: "Pending", cnt: 0, color: "#a78bfa" },
-    urgent: { name: "Urgent", cnt: 0, color: "#f87171" },
+    complete: { name: "Completed", cnt: 0, color: "#10b981" },
+    running: { name: "Active", cnt: 0, color: "#8b5cf6" },
+    upcoming: { name: "Upcoming", cnt: 0, color: "#06b6d4" },
+    pending: { name: "Pending", cnt: 0, color: "#f59e0b" },
+    urgent: { name: "Urgent", cnt: 0, color: "#ef4444" },
   };
-  const gradients = [
-    "from-orange-100 via-pink-100 to-rose-100 hover:from-orange-200 hover:via-pink-200 hover:to-rose-200",
-    "from-cyan-100 via-blue-100 to-indigo-100 hover:from-cyan-200 hover:via-blue-200 hover:to-indigo-200",
-    "from-emerald-100 via-teal-100 to-cyan-100 hover:from-emerald-200 hover:via-teal-200 hover:to-cyan-200",
-    "from-violet-100 via-purple-100 to-fuchsia-100 hover:from-violet-200 hover:via-purple-200 hover:to-fuchsia-200",
-    "from-amber-100 via-yellow-100 to-orange-100 hover:from-amber-200  hover:via-yellow-200 hover:to-orange-200",
-    "from-pink-100 via-purple-100 to-blue-100 hover:from-pink-200 hover:via-purple-200 hover:to-blue-200",
-  ];
-  console.log(overvew);
 
-  // return <UnderDevelopment />;
+  // Modern vibrant gradients for 2025
+  const gradients = [
+    "from-rose-400 via-fuchsia-500 to-purple-600 hover:from-rose-500 hover:via-fuchsia-600 hover:to-purple-700",
+    "from-cyan-400 via-sky-500 to-blue-600 hover:from-cyan-500 hover:via-sky-600 hover:to-blue-700",
+    "from-emerald-400 via-teal-500 to-cyan-600 hover:from-emerald-500 hover:via-teal-600 hover:to-cyan-700",
+    "from-violet-400 via-purple-500 to-fuchsia-600 hover:from-violet-500 hover:via-purple-600 hover:to-fuchsia-700",
+    "from-amber-400 via-orange-500 to-red-600 hover:from-amber-500 hover:via-orange-600 hover:to-red-700",
+    "from-pink-400 via-rose-500 to-orange-600 hover:from-pink-500 hover:via-rose-600 hover:to-orange-700",
+  ];
+
+  const cardColors = [
+    { bg: "from-purple-500 to-pink-600", icon: "from-purple-600 to-pink-700", badge: "bg-purple-100 text-purple-700" },
+    { bg: "from-cyan-500 to-blue-600", icon: "from-cyan-600 to-blue-700", badge: "bg-cyan-100 text-cyan-700" },
+    { bg: "from-emerald-500 to-teal-600", icon: "from-emerald-600 to-teal-700", badge: "bg-emerald-100 text-emerald-700" },
+  ];
+
   return (
-    <div className={`transition-all duration-300 lg:ml-64 pt-16 min-h-screen`}>
+    <div className={`transition-all duration-300 lg:ml-64 pt-16 min-h-screen bg-gradient-to-br from-slate-50 to-gray-100`}>
       <div className="p-6">
+        {/* Header */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
             Dashboard Overview
           </h2>
-          <p className="text-gray-600 mt-1">
-            Welcome back, {user ? user?.name.toUpperCase() : "ENGINEER"}
+          <p className="text-gray-600 mt-2">
+            Welcome back, <span className="font-semibold text-purple-600">{user ? user?.name.toUpperCase() : "ENGINEER"}</span>
           </p>
         </div>
+
+        {/* Desktop Cards */}
         <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {(overvew?.statusGroups
             ? Object.entries(overvew.statusGroups)
             : Object.entries(statusGroups)
           )
-            .filter(
-              ([key]) => !["START", "WORK", "END"].includes(key)
-            )
+            .filter(([key]) => !["START", "WORK", "END"].includes(key))
             .map(([_, item], index) => (
               <div
                 onClick={() => setActiveCard(router[item.name])}
                 key={index}
-                className="cursor-pointer relative overflow-hidden bg-white rounded-xl shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px]"
+                className="cursor-pointer group relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:shadow-2xl hover:translate-y-[-4px]"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-100/40 to-purple-100/30 rounded-bl-[100px] -z-10"></div>
+                {/* Gradient Background Blob */}
+                <div className={`absolute top-0 right-0 w-40 h-40 bg-gradient-to-br ${cardColors[index % cardColors.length].bg} opacity-10 rounded-bl-[120px] group-hover:opacity-20 transition-opacity duration-300`}></div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between relative z-10">
                   <div>
-                    <p className="text-sm font-medium uppercase tracking-wider text-gray-500">
+                    <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
                       TOTAL
                     </p>
-                    <h3 className="text-3xl font-bold text-gray-800 mt-1">
+                    <h3 className="text-4xl font-black text-gray-800 mt-2">
                       <span className="inline-block animate-fadeIn">
                         {item.cnt}
                       </span>
                     </h3>
                   </div>
-                  <div className="flex items-center justify-center rounded-full p-3 bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md shadow-indigo-500/20">
-                    <FaBook className="text-white" size={26} />
+                  <div className={`flex items-center justify-center rounded-2xl p-4 bg-gradient-to-br ${cardColors[index % cardColors.length].icon} shadow-xl group-hover:scale-110 transition-transform duration-300`}>
+                    <FaBook className="text-white" size={28} />
                   </div>
                 </div>
 
-                <div className="mt-5 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full width-full"></div>
+                {/* Progress Bar */}
+                <div className="mt-6 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-full bg-gradient-to-r ${cardColors[index % cardColors.length].bg} rounded-full w-full transform origin-left group-hover:scale-x-105 transition-transform duration-300`}></div>
                 </div>
 
-                <div className="mt-3 flex items-center">
-                  <span className="ml-auto bg-indigo-50 text-indigo-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                {/* Badge */}
+                <div className="mt-4 flex items-center justify-end">
+                  <span className={`${cardColors[index % cardColors.length].badge} text-xs font-bold px-3 py-1.5 rounded-full`}>
                     {item.name}
                   </span>
                 </div>
@@ -93,68 +102,68 @@ const ProjectOverview = ({ overvew, setActiveCard }) => {
             ))}
         </div>
 
+        {/* Mobile Cards */}
         <div className="md:hidden grid grid-cols-2 gap-4 mb-8">
           {Object.entries(overvew?.statusGroups || statusGroups)
-            .filter(
-              ([key]) => !["START", "WORK", "END"].includes(key)
-            )
+            .filter(([key]) => !["START", "WORK", "END"].includes(key))
             .map(([key, item], index) => (
               <div
                 key={key}
                 onClick={() => setActiveCard(router[item.name])}
-                className={`relative overflow-hidden p-4 rounded-2xl border border-indigo-100 shadow-md hover:shadow-lg transition-all duration-300 flex flex-col justify-between bg-gradient-to-br ${gradients[index % gradients.length]
-                  }`}
+                className={`group relative overflow-hidden p-5 rounded-2xl border-2 border-white shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col justify-between bg-gradient-to-br ${gradients[index % gradients.length]}`}
               >
-                <div className="absolute inset-0 rounded-2xl bg-white/20 backdrop-blur-sm" />
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
 
                 <div className="relative z-10">
-                  <p className="text-[11px] text-gray-600">TOTAL</p>
-                  <h3 className="text-xl font-bold text-gray-800">
+                  <p className="text-xs font-bold text-white/90">TOTAL</p>
+                  <h3 className="text-3xl font-black text-white mt-1 drop-shadow-lg">
                     {item.cnt}
                   </h3>
                 </div>
 
-                <div className="relative z-10 mt-2 flex justify-between items-center">
-                  <span className="text-xs font-medium text-indigo-700 bg-white/60 px-2.5 py-1 rounded-full">
+                <div className="relative z-10 mt-3">
+                  <span className="text-xs font-bold text-white bg-white/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/50">
                     {item.name}
                   </span>
                 </div>
               </div>
             ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">
 
+        {/* High Priority Projects & Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              HIGH PRIORITY PROJECTS
             </h3>
-            <div className="space-y-3 sm:space-y-4 h-[280px] sm:h-70 overflow-y-auto pr-2 cursor-grab">
+            <div className="space-y-4 h-[320px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-gray-100">
               {(overvew?.highPriority ? overvew.highPriority : []).map(
                 (project, indx) => (
                   <div
-                    className="flex items-start italic space-x-3 sm:space-x-4"
+                    className="flex items-start space-x-4 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-all duration-300 group"
                     key={indx}
                   >
-                    <div className="bg-blue-100 p-1.5 sm:p-2 rounded-full mr-3 sm:mr-4">
-                      <FaUser className="text-blue-500" size={16} />
+                    <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-2.5 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <FaUser className="text-white" size={18} />
                     </div>
-                    <div>
-                      <p className="text-gray-800 font-medium text-sm sm:text-base">
+                    <div className="flex-1">
+                      <p className="text-gray-800 font-bold text-base">
                         {project.JobNumber}
                       </p>
-                      <p className="text-gray-500 text-xs sm:text-sm truncate max-w-[220px] sm:max-w-none">
+                      <p className="text-gray-600 text-sm mt-1 line-clamp-1">
                         {project.projectName}
                       </p>
-                      <div className="flex flex-wrap gap-1 sm:gap-2 mt-1">
-                        <span className="bg-blue-100 text-blue-600 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full">
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <span className="bg-cyan-100 text-cyan-700 text-xs font-bold px-2.5 py-1 rounded-full">
                           D-{project?.summary?.document}
                         </span>
-                        <span className="bg-yellow-100 text-yellow-600 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full">
+                        <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full">
                           S-{project?.summary?.scada}
                         </span>
-                        <span className="bg-green-100 text-green-600 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full">
+                        <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full">
                           L-{project?.summary?.logic}
                         </span>
-                        <span className="bg-purple-100 text-purple-600 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full">
+                        <span className="bg-violet-100 text-violet-700 text-xs font-bold px-2.5 py-1 rounded-full">
                           T-{project?.summary?.test}
                         </span>
                       </div>
@@ -165,74 +174,72 @@ const ProjectOverview = ({ overvew, setActiveCard }) => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            {/* <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-4">
               STATUS OVERVIEW
-            </h3> */}
-            {/* <div className="h-70 flex items-center justify-center">
+            </h3>
+            <div className="h-[320px] flex items-center justify-center">
               <LollipopChart
                 statusGroupschart={
                   overvew?.chart ? overvew.chart : statusGroupschart
                 }
               />
-            </div> */}
+            </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+
+        {/* Recent Projects Table */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <h3 className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-6">
             LAST 3 PROJECTS ASSIGNED FOR YOU
           </h3>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead>
+              <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Project Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Priority
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     End Date(Expected)
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Client
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {(overvew?.latestProjects ? overvew.latestProjects : []).map(
                   (project, indx) => (
-                    <tr key={indx}>
+                    <tr key={indx} className="hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-colors duration-200">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {project.projectName}
-                            </div>
-                          </div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {project.projectName}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <span className="px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r from-amber-100 to-orange-100 text-orange-700">
                           {project.priority}
-                        </div>
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        <span className="px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700">
                           {project.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">
                         {project?.endDate
                           ? format(new Date(project.endDate), "dd MMM yyyy")
                           : "NOT PROVIDED"}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="text-indigo-600 hover:text-indigo-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold">
+                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                           {project.client}
                         </div>
                       </td>

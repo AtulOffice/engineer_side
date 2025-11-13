@@ -5,8 +5,6 @@ import TaskDisplay from "./component/dashboard.jsx";
 import { AppProvider, useAppContext } from "./appContex";
 import ProjectdevlopForm from "./component/add.devstatus.jsx";
 import { UserCall } from "./utils/apiCall.jsx";
-import StartChecklistForm from "./component/startcheckList.jsx";
-import EndChecklistForm from "./component/endCheklist.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const { user, userLoading } = useAppContext();
@@ -53,8 +51,6 @@ const AppRoutes = () => {
         }
       />
 
-      <Route path="/start" element={<StartChecklistForm />} />
-      <Route path="/end" element={<EndChecklistForm />} />
       <Route path="/login" element={<LoginPage />} />
 
       <Route

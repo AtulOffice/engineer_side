@@ -1,9 +1,13 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useAppContext } from "../appContex";
 
 const ENUMVAL = ["YES", "NO", "N/A"];
 const PROJECT_STATUS = ["OPEN", "CLOSED"];
 
-export default function EndChecklistForm({ project, end, onClose }) {
+export default function EndChecklistForm({ project, onClose }) {
+  const { user } = useAppContext()
   const [formData, setFormData] = useState({
     email: "",
     jobNumber: "",
@@ -34,17 +38,95 @@ export default function EndChecklistForm({ project, end, onClose }) {
   });
 
   useEffect(() => {
-    if (project) {
-      setFormData((prev) => ({
-        ...prev,
-        jobNumber: project.jobNumber || "",
-        engineerName: project.engineerName || "",
-        customerName: project.customerName || "",
-        endUser: project.endUser || "",
-        site: project.site || "",
-      }));
-    }
+    if (!project?._id) return;
+
+    const loadData = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/endCheck/project/${project._id}`
+        );
+        const checklist = res.data?.data || null;
+
+        if (checklist) {
+          setFormData(prev => ({
+            ...prev,
+            jobNumber: checklist.jobNumber || project.jobNumber || "",
+            engineerName: checklist.engineerName || user?.name || "",
+            customerName: checklist.customerName || project.client || "",
+            endUser: checklist.endUser || project.endUser || "",
+            site: checklist.site || project.location || "",
+
+            poNumber: checklist.poNumber || project.orderNumber || "",
+            poDate: checklist.poDate
+              ? checklist.poDate.split("T")[0]
+              : project.orderDate
+                ? new Date(project.orderDate).toISOString().split("T")[0]
+                : "",
+
+            contactPerson: checklist.contactPerson || project.ContactPersonName || "",
+            contactPersonNumber:
+              checklist.contactPersonNumber || project.ContactPersonNumber || "",
+
+            visitStartDate: checklist.visitStartDate
+              ? checklist.visitStartDate.split("T")[0]
+              : project.visitDate
+                ? new Date(project.visitDate).toISOString().split("T")[0]
+                : "",
+
+            visitEndDate: checklist.visitEndDate
+              ? checklist.visitEndDate.split("T")[0]
+              : "",
+
+            momNumber: checklist.momNumber || "",
+            projectStatus: checklist.projectStatus || "",
+            momSignedByCustomer: checklist.momSignedByCustomer || "",
+            pendingPoints: checklist.pendingPoints || "",
+            customerRemarks: checklist.customerRemarks || "",
+            completedWithinEstimatedTime:
+              checklist.completedWithinEstimatedTime ?? false,
+            facedChallenges: checklist.facedChallenges ?? false,
+            challengeDetails: checklist.challengeDetails || "",
+            completionDocuments: {
+              ...prev.completionDocuments,
+              ...checklist.completionDocuments,
+            },
+
+            email: checklist.email || user?.email || ""
+          }));
+
+          return;
+        }
+
+        setFormData(prev => ({
+          ...prev,
+          jobNumber: project.jobNumber || "",
+          engineerName: user?.name || "",
+          customerName: project.client || "",
+          endUser: project.endUser || "",
+          site: project.location || "",
+
+          poNumber: project.orderNumber || "",
+          poDate: project.orderDate
+            ? new Date(project.orderDate).toISOString().split("T")[0]
+            : "",
+
+          contactPerson: project.ContactPersonName || "",
+          contactPersonNumber: project.ContactPersonNumber || "",
+
+          visitStartDate: project.visitDate
+            ? new Date(project.visitDate).toISOString().split("T")[0]
+            : "",
+
+          email: user?.email || "",
+        }));
+      } catch (error) {
+        console.log("❌ Failed to load END checklist:", error);
+      }
+    };
+
+    loadData();
   }, [project]);
+
 
   const handleChange = (e, section, key) => {
     const { name, value, type, checked } = e.target;
@@ -61,10 +143,40 @@ export default function EndChecklistForm({ project, end, onClose }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
+    e.stopPropagation();
+
+    try {
+      if (!formData.jobNumber || !formData.engineerName || !formData.customerName) {
+        toast.error("Please fill all required fields");
+        return;
+      }
+
+      const bodyData = {
+        ...formData,
+        poDate: formData.poDate ? new Date(formData.poDate) : null,
+        visitStartDate: formData.visitStartDate ? new Date(formData.visitStartDate) : null,
+        visitEndDate: formData.visitEndDate ? new Date(formData.visitEndDate) : null,
+
+        projectId: project?._id || null,
+        submittedBy: user?._id || null,
+      };
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/endCheck/save`,
+        bodyData
+      );
+
+      toast.success(response.data?.message || "End Checklist Saved Successfully");
+      console.log("✔ Response:", response.data);
+
+      onClose();
+    } catch (error) {
+      console.error("❌ Submit Error:", error);
+      toast.error(error.response?.data?.message || "Failed to submit checklist");
+    }
   };
+
 
   const renderEnumSelect = (
     section,

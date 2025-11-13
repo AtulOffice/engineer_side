@@ -28,7 +28,6 @@ const EngineerWorkStatus = ({ project, onClose, work }) => {
       return;
     }
     console.log("Form submitted:", formData);
-    // API call would go here
   };
 
   const handleChange = (e) => {

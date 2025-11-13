@@ -58,11 +58,10 @@ const WeeklyTableAll = ({ data }) => {
               {data.map((item, indx) => (
                 <tr
                   key={indx}
-                  className={`hover:bg-blue-50/60 transition-colors duration-150 ${
-                    indx % 2 === 0
+                  className={`hover:bg-blue-50/60 transition-colors duration-150 ${indx % 2 === 0
                       ? "bg-gradient-to-r from-white via-blue-50 to-white"
                       : "bg-gradient-to-r from-white via-blue-100 to-white"
-                  }`}
+                    }`}
                 >
                   <td className="px-6 py-4">
                     <div

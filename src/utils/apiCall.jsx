@@ -14,6 +14,12 @@ export const fetchEngineerOveriew = async (id) => {
   }
 };
 
+
+
+
+
+
+
 export const fetchProjects = async ({ page, search, id }) => {
   try {
     const res = await axios.get(
@@ -142,7 +148,6 @@ export const login = async ({ email, password, navigate, setUser }) => {
     toast.error("Please enter both email and password");
     return;
   }
-  console.log(email)
 
   try {
     const response = await axios.post(
