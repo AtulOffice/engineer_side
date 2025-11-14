@@ -7,8 +7,7 @@ import { filterProjectsUtils } from "../utils/filterUtils";
 import FilterCompo from "../utils/FilterCompo";
 import FilterCompodev from "../utils/filtercompo.dev";
 import CardWorkStatus from "./CardWorkStatus";
-import { fetchProjects, fetchWorkStatus } from "../utils/apiCall";
-import dayjs from "dayjs";
+import { fetchProjects, fetchWorkStatusEngineerEngineer } from "../utils/apiCall";
 import { fetchProjectsDevprogress } from "../utils/apiCall.Dev";
 import CardStatus from "./Card.Development";
 
@@ -56,7 +55,8 @@ export const ProjectCatogary = ({
             statusFilter: statusFilter,
           });
         } else {
-          val = await fetchWorkStatus({
+          val = await fetchWorkStatusEngineerEngineer({
+            id: user?._id,
             page: currentPage,
             search: debounceSearchTerm || "",
           });

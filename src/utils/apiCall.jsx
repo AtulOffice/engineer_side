@@ -15,11 +15,6 @@ export const fetchEngineerOveriew = async (id) => {
 };
 
 
-
-
-
-
-
 export const fetchProjects = async ({ page, search, id }) => {
   try {
     const res = await axios.get(
@@ -190,11 +185,11 @@ export const logout = async () => {
   }
 };
 
-export const fetchWorkStatus = async ({ page, search }) => {
+export const fetchWorkStatusEngineerEngineer = async ({ page, search, id }) => {
   try {
     const res = await axios.get(
       `${import.meta.env.VITE_API_URL
-      }/worksts/pagination?page=${page}&limit=15&search=${search}`,
+      }/worksts/paginationeng/${id}?page=${page}&limit=15&search=${search}`,
       { withCredentials: true }
     );
     return { data: res.data.data, hashMore: page < res.data.totalPages };

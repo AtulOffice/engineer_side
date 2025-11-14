@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Briefcase, Calendar, MapPin, Users, FileText } from "lucide-react";
+import axios from "axios";
+import { useAppContext } from "../appContex";
+import toast from "react-hot-toast";
 
-const EngineerWorkStatusFull = ({ project }) => {
+const EngineerWorkStatusFull = () => {
+    const { user } = useAppContext()
+    const [data, setData] = useState()
+    const [loading, setLoading] = useState(false)
     const userformval = {
         workstatus: "",
         currentEngineerName: "",
@@ -17,19 +23,77 @@ const EngineerWorkStatusFull = ({ project }) => {
         StartChecklist: "N/A",
         ExpensSubmission: "N/A",
         BackupSubmission: "N/A",
+        ProjectId: "",
+        submittedBy: ""
     };
 
     const [formData, setFormData] = useState(userformval);
 
+    useEffect(() => {
+        if (!formData.jobNumber) {
+            setFormData(userformval)
+            return;
+        }
+        const selectedProject = data?.lastFiveAssignments?.find(
+            (item) => item.jobNumber === formData.jobNumber
+        );
+        if (selectedProject) {
+            setFormData((prev) => ({
+                ...prev,
+                submittedBy: user?._id,
+                ProjectId: selectedProject.projectId?._id,
+                currentEngineerName: user?.name,
+                projectName: selectedProject.projectId?.projectName || "",
+                location: selectedProject.projectId?.location,
+                StartChecklist: selectedProject.projectId?.StartChecklist,
+                EndChecklist: selectedProject.projectId?.EndChecklist,
+            }));
+        }
+    }, [formData.jobNumber, data]);
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/engineerside/fetchAllProject/${user?._id}`, { withCredentials: true })
+                setData(response?.data)
+                console.log(response?.data?.lastFiveAssignments)
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        if (user?._id) fetchData();
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (new Date(formData.statusStartDate) > new Date(formData.statusEndDate)) {
-            alert("Start date must be before end date");
+            toast.error("Start date must be before end date");
             return;
         }
-        console.log("Form submitted:", formData);
-    };
 
+        try {
+            setLoading(true);
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/worksts/save`,
+                formData,
+                { withCredentials: true }
+            );
+            if (response.data.success) {
+                toast.success("Work status submitted successfully!");
+                setFormData(userformval);
+            } else {
+                toast.error(response.data.message || "Something went wrong");
+            }
+        } catch (error) {
+            console.error("Submit Error:", error);
+            toast.error(error.response?.data?.message || "Server error");
+        } finally {
+            setLoading(false);
+        }
+    };
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData((prev) => ({
@@ -37,6 +101,7 @@ const EngineerWorkStatusFull = ({ project }) => {
             [name]: type === "checkbox" ? checked : value,
         }));
     };
+
 
     return (
         <div className="lg:ml-64 pt-20 min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50/30 to-indigo-50 p-8">
@@ -65,18 +130,30 @@ const EngineerWorkStatusFull = ({ project }) => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Job Number */}
-                            <div>
-                                <label className="block mb-2 text-sm font-semibold text-slate-700">
+                            <div className="group">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
                                     Job Number <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     name="jobNumber"
-                                    value={formData.jobNumber}
+                                    value={formData.jobNumber || ""}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                                    required
-                                />
+                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl 
+             focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 
+             transition-all duration-200 outline-none bg-gray-50 
+             group-hover:border-gray-300 appearance-none cursor-pointer"
+                                >
+                                    <option value="">Select Job Number</option>
+
+                                    {data?.lastFiveAssignments?.map((item, index) => (
+                                        <option key={index} value={item.jobNumber}>
+                                            {item.jobNumber}—{item.projectId?.projectName
+                                                ? item.projectId.projectName.slice(0, 15) +
+                                                (item.projectId.projectName.length > 15 ? "..." : "")
+                                                : "Unnamed Project"}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             {/* Order Number */}
@@ -110,24 +187,7 @@ const EngineerWorkStatusFull = ({ project }) => {
                                 />
                             </div>
 
-                            {/* SO Type */}
-                            <div>
-                                <label className="block mb-2 text-sm font-semibold text-slate-700">
-                                    SO Type
-                                </label>
-                                <select
-                                    name="soType"
-                                    value={formData.soType}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
-                                >
-                                    <option value="PROJECT">PROJECT</option>
-                                    <option value="SERVICE">SERVICE</option>
-                                    <option value="MAINTENANCE">MAINTENANCE</option>
-                                </select>
-                            </div>
 
-                            {/* Location */}
                             <div>
                                 <label className="block mb-2 text-sm font-semibold text-slate-700 flex items-center gap-2">
                                     <MapPin className="w-4 h-4" /> Location
@@ -143,120 +203,6 @@ const EngineerWorkStatusFull = ({ project }) => {
                         </div>
                     </div>
 
-                    {/* Checklist Section */}
-                    <div className="bg-white rounded-xl p-6 shadow border border-slate-200">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-4">
-                            Checklist Status
-                        </h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Start Checklist */}
-                            <div>
-                                <label className="block mb-2 text-sm font-semibold text-slate-700">
-                                    Start Checklist
-                                </label>
-                                <select
-                                    name="StartChecklist"
-                                    value={formData.StartChecklist}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
-                                >
-                                    <option value="N/A">N/A</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Pending">Pending</option>
-                                </select>
-                            </div>
-
-                            {/* End Checklist */}
-                            <div>
-                                <label className="block mb-2 text-sm font-semibold text-slate-700">
-                                    End Checklist
-                                </label>
-                                <select
-                                    name="EndChecklist"
-                                    value={formData.EndChecklist}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
-                                >
-                                    <option value="N/A">N/A</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Pending">Pending</option>
-                                </select>
-                            </div>
-
-                            {/* Expense Submission */}
-                            <div>
-                                <label className="block mb-2 text-sm font-semibold text-slate-700">
-                                    Expense Submission
-                                </label>
-                                <select
-                                    name="ExpensSubmission"
-                                    value={formData.ExpensSubmission}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
-                                >
-                                    <option value="N/A">N/A</option>
-                                    <option value="Submitted">Submitted</option>
-                                    <option value="Pending">Pending</option>
-                                </select>
-                            </div>
-
-                            {/* Backup Submission */}
-                            <div>
-                                <label className="block mb-2 text-sm font-semibold text-slate-700">
-                                    Backup Submission
-                                </label>
-                                <select
-                                    name="BackupSubmission"
-                                    value={formData.BackupSubmission}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
-                                >
-                                    <option value="N/A">N/A</option>
-                                    <option value="Submitted">Submitted</option>
-                                    <option value="Pending">Pending</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Engineer Details */}
-                    <div className="bg-white rounded-xl p-6 shadow border border-slate-200">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                            <Users className="w-5 h-5 text-indigo-600" />
-                            Engineer Details
-                        </h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Current Engineer Name */}
-                            <div>
-                                <label className="block mb-2 text-sm font-semibold text-slate-700">
-                                    Current Engineer Name
-                                </label>
-                                <input
-                                    type="text"
-                                    name="currentEngineerName"
-                                    value={formData.currentEngineerName}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
-                                />
-                            </div>
-
-                            {/* All Engineers */}
-                            <div>
-                                <label className="block mb-2 text-sm font-semibold text-slate-700">
-                                    All Engineers
-                                </label>
-                                <input
-                                    type="text"
-                                    name="engineerName"
-                                    value={formData.engineerName.join(", ")}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
-                                />
-                            </div>
-                        </div>
-                    </div>
 
                     {/* Date Section */}
                     <div className="bg-white rounded-xl p-6 shadow border border-slate-200">

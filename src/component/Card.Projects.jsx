@@ -68,7 +68,6 @@ const CardAll = ({ project, indx }) => {
       {work && (
         <EngineerWorkStatus
           project={project}
-          work={work}
           onClose={() => setWork(false)}
         />
       )}

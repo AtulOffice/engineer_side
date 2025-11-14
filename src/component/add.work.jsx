@@ -1,34 +1,82 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Briefcase, Calendar, MapPin, Users, FileText } from "lucide-react";
+import { useAppContext } from "../appContex";
+import toast from "react-hot-toast";
+import axios from "axios";
 
-const EngineerWorkStatus = ({ project, onClose, work }) => {
+const EngineerWorkStatus = ({ project, onClose }) => {
+  const [loading, setLoading] = useState(false)
+  const { user } = useAppContext()
   const userformval = {
     workstatus: "",
     currentEngineerName: "",
     projectName: "",
-    engineerName: [],
-    soType: "PROJECT",
     statusStartDate: "",
     statusEndDate: "",
     jobNumber: "",
     orderNumber: "",
     location: "",
+    // this is old data
+    soType: "PROJECT",
     EndChecklist: "N/A",
     StartChecklist: "N/A",
     ExpensSubmission: "N/A",
     BackupSubmission: "N/A",
+    engineerName: [],
   };
 
   const [formData, setFormData] = useState(userformval);
 
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, jobNumber: project?.jobNumber || "", orderNumber: project?.orderNumber || "", projectName: project?.projectName || "", location: project?.location || "" }))
+  }, [project])
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (new Date(formData.statusStartDate) > new Date(formData.statusEndDate)) {
-      alert("Start date must be before end date");
+      toast.error("Start date must be before end date");
       return;
     }
-    console.log("Form submitted:", formData);
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        ...formData,
+        submittedBy: user?._id,
+        ProjectId: project?._id,
+        currentEngineerName: user?.name,
+      };
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/worksts/save`,
+        payload,
+        { withCredentials: true }
+      );
+      if (response.data.success) {
+        toast.success("Work status submitted successfully!");
+        setFormData({
+          statusStartDate: "",
+          statusEndDate: "",
+          WorkStatus: "",
+          StartChecklist: "",
+          EndChecklist: "",
+          jobNumber: "",
+          projectName: "",
+          location: "",
+        });
+        onClose()
+      } else {
+        toast.error(response.data.message || "Something went wrong");
+      }
+    } catch (error) {
+      console.error("Submit Error:", error);
+      toast.error(error.response?.data?.message || "Server error");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -87,21 +135,20 @@ const EngineerWorkStatus = ({ project, onClose, work }) => {
                   />
                 </div>
 
-                {formData.orderNumber && (
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-slate-700">
-                      Order Number
-                    </label>
-                    <input
-                      type="text"
-                      name="orderNumber"
-                      value={formData.orderNumber}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                      placeholder="Enter order number"
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className="block mb-2 text-sm font-semibold text-slate-700">
+                    Order Number
+                  </label>
+                  <input
+                    type="text"
+                    name="orderNumber"
+                    value={formData.orderNumber}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    placeholder="Enter order number"
+                  />
+                </div>
+
 
                 <div>
                   <label className="block mb-2 text-sm font-semibold text-slate-700">
@@ -117,7 +164,7 @@ const EngineerWorkStatus = ({ project, onClose, work }) => {
                     placeholder="Enter project name"
                   />
                 </div>
-
+                {/* 
                 <div>
                   <label className="block mb-2 text-sm font-semibold text-slate-700">
                     SO Type <span className="text-red-500">*</span>
@@ -133,7 +180,7 @@ const EngineerWorkStatus = ({ project, onClose, work }) => {
                     <option value="SERVICE">SERVICE</option>
                     <option value="MAINTENANCE">MAINTENANCE</option>
                   </select>
-                </div>
+                </div> */}
 
                 <div>
                   <label className="block mb-2 text-sm font-semibold text-slate-700 flex items-center gap-1">
@@ -153,7 +200,7 @@ const EngineerWorkStatus = ({ project, onClose, work }) => {
             </div>
 
             {/* Checklist Section */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            {/* <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
               <h3 className="text-lg font-semibold text-slate-800 mb-4">
                 Checklist Status
               </h3>
@@ -222,10 +269,10 @@ const EngineerWorkStatus = ({ project, onClose, work }) => {
                   </select>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Engineer Details Section */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            {/* <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
               <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                 <Users className="w-5 h-5 text-indigo-600" />
                 Engineer Details
@@ -259,7 +306,7 @@ const EngineerWorkStatus = ({ project, onClose, work }) => {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Date Range Section */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">

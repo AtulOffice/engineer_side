@@ -205,7 +205,7 @@ const StartChecklistForm = ({ project, onClose }) => {
         poDate: formData.poDate ? new Date(formData.poDate) : null,
         visitStartDate: formData.visitStartDate ? new Date(formData.visitStartDate) : null,
         projectId: project?._id || null,
-        submitteddBy: user?._id || null,
+        submittedBy: user?._id || null,
       });
       toast.success("Start Checklist Submitted Successfully");
       onClose();
