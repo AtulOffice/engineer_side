@@ -33,18 +33,7 @@ export const fetchProjects = async ({ page, search, id }) => {
   }
 };
 
-export const fetchProjectsUrgentAction = async ({ search }) => {
-  try {
-    const res = await axios.get(
-      `${import.meta.env.VITE_API_URL}/urgentProjectAction?search=${search}`,
-      { withCredentials: true }
-    );
-    return res.data.data;
-  } catch (err) {
-    console.error("Failed to fetch projects:", err);
-    throw err;
-  }
-};
+
 
 export const fetfchProejctAll = async ({ search }) => {
   try {
@@ -59,19 +48,6 @@ export const fetfchProejctAll = async ({ search }) => {
   }
 };
 
-export const saveAllEngineers = async (data) => {
-  try {
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/engineer/addEngineer`,
-      data,
-      { withCredentials: true }
-    );
-    return res.data;
-  } catch (err) {
-    console.error("error while saving", err);
-    throw err;
-  }
-};
 
 export const getavailableEngineers = async () => {
   try {

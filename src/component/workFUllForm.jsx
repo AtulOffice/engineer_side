@@ -3,6 +3,7 @@ import { X, Briefcase, Calendar, MapPin, Users, FileText } from "lucide-react";
 import axios from "axios";
 import { useAppContext } from "../appContex";
 import toast from "react-hot-toast";
+import ExcelDocsInput from "../utils/Excelimport";
 
 const EngineerWorkStatusFull = () => {
     const { user } = useAppContext()
@@ -94,12 +95,24 @@ const EngineerWorkStatusFull = () => {
             setLoading(false);
         }
     };
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
+    const handleChange = (eOrName, value) => {
+        // Case 1: Normal event (input/select/textarea OR ExcelDocsInput)
+        if (eOrName?.target) {
+            const { name, value, type, checked } = eOrName.target;
+            setFormData((prev) => ({
+                ...prev,
+                [name]: type === "checkbox" ? checked : value,
+            }));
+            return;
+        }
+
+        // Case 2: Manual call handleChange("key", value)
+        if (typeof eOrName === "string") {
+            setFormData((prev) => ({
+                ...prev,
+                [eOrName]: value,
+            }));
+        }
     };
 
 
@@ -182,6 +195,7 @@ const EngineerWorkStatusFull = () => {
                                     name="projectName"
                                     value={formData.projectName}
                                     onChange={handleChange}
+                                    placeholder="enter projet name"
                                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
                                     required
                                 />
@@ -196,6 +210,7 @@ const EngineerWorkStatusFull = () => {
                                     type="text"
                                     name="location"
                                     value={formData.location}
+                                    placeholder="enter site location"
                                     onChange={handleChange}
                                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg"
                                 />
@@ -245,7 +260,7 @@ const EngineerWorkStatusFull = () => {
                     </div>
 
                     {/* Work Status Notes */}
-                    <div className="bg-white rounded-xl p-6 shadow border border-slate-200">
+                    {/* <div className="bg-white rounded-xl p-6 shadow border border-slate-200">
                         <label className="block mb-2 text-sm font-semibold text-slate-700">
                             Work Status Details
                         </label>
@@ -257,7 +272,19 @@ const EngineerWorkStatusFull = () => {
                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg resize-none"
                             placeholder="Enter detailed work status..."
                         />
+                    </div> */}
+
+                    <div className="bg-white rounded-xl p-6 shadow border border-slate-200">
+                        <label className="block mb-2 text-sm font-semibold text-slate-700">
+                            Work Status Details <span className="text-red-500">*</span>
+                        </label>
+
+                        <ExcelDocsInput
+                            value={formData.workstatus}
+                            onChange={(e) => handleChange(e)}
+                        />
                     </div>
+
 
                     {/* Submit Button */}
                     <div className="flex justify-center">
